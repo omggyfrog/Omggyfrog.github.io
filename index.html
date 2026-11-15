@@ -141,8 +141,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* ---------- tab bar ---------- */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bar);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.tabbar-in{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:var(--nav-h)}
-.tab{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--dim);text-decoration:none;font:600 clamp(8.5px,2.4vw,10.5px)/1 var(--font-body);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.tabbar-in{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));height:var(--nav-h)}
+.tab{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--dim);text-decoration:none;font:600 clamp(8px,2.2vw,10.5px)/1 var(--font-body);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .tab svg{width:22px;height:22px}
 .tab:hover{color:var(--dust)}
 .tab[aria-current="page"]{color:var(--brass)}
@@ -1265,6 +1265,19 @@ body:has(#menu:not([hidden])) .toasts{z-index:95;bottom:calc(env(safe-area-inset
 #introMode{padding:8px 11px;border-radius:10px;background:rgba(0,0,0,.18);border:1px solid var(--line-strong);font-size:14px}
 html.hard #introMode{border-color:rgba(226,106,82,.5)}
 @media (max-width:420px){.tabbar .wrap{padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}.tab{letter-spacing:0}}
+/* ---------- leaderboard ---------- */
+.lb{list-style:none;margin:0;padding:0}
+.lb li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px dashed var(--line)}
+.lb li:last-child{border-bottom:0}
+.lb li.me{background:rgba(212,167,58,.1);box-shadow:inset 3px 0 0 var(--brass)}
+.lb-rank{font:800 18px/1 var(--font-display);color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+.lb li:nth-child(-n+3) .lb-rank{color:var(--brass-hi)}
+.lb-who{min-width:0;display:grid;gap:3px}
+.lb-who b{font:700 15px/1.15 var(--font-body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-who small{font:400 11.5px/1 var(--font-mono);color:var(--dim)}
+.lb-gold{display:flex;align-items:center;font:800 20px/1 var(--font-display);font-variant-numeric:tabular-nums}
+.lb-msg{margin:0;padding:18px 14px;font:400 13px/1.45 var(--font-mono);color:var(--dust)}
+.lb-note{margin:10px 2px 0;font:400 12.5px/1.4 var(--font-mono);color:var(--dim)}
 </style>
 
 </head>
@@ -1295,6 +1308,7 @@ html.hard #introMode{border-color:rgba(226,106,82,.5)}
     <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></g></symbol>
     <symbol id="i-casino" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3M6 6l2.1 2.1M15.9 15.9 18 18M18 6l-2.1 2.1M8.1 15.9 6 18"/></g></symbol>
     <symbol id="i-trade" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M3 20h18"/><path d="M4 16l5-5 4 3 7-8"/><path d="M15 6h5v5"/></g></symbol>
+    <symbol id="i-ranks" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 8.5 8 12.5 12 5l4 7.5 4.5-4-1.5 9.5H5z"/><path d="M6 21h12"/></g></symbol>
     <symbol id="s-can" viewBox="0 0 120 120">
       <ellipse cx="60" cy="106" rx="34" ry="7" fill="#000" opacity=".35"/>
       <path d="M30 26h60v72c0 5-13.4 9-30 9s-30-4-30-9z" fill="#9aa5b1"/>
@@ -1697,6 +1711,18 @@ html.hard #introMode{border-color:rgba(226,106,82,.5)}
     </section>
   </section>
 
+  <!-- RANKS -->
+  <section class="view" data-view="ranks" hidden>
+    <header class="vhead">
+      <p class="eyebrow mono">Everyone who has played</p>
+      <h1 class="h-stencil">Leaderboard</h1>
+      <p class="lede">Every player, ranked by the gold they hold right now.</p>
+    </header>
+    <div class="sec-head"><h2 class="h2">Top 50</h2><button class="btn btn-sm" type="button" id="lbRefresh">Refresh</button></div>
+    <div class="panel" id="lbBox"></div>
+    <p class="lb-note" id="lbNote"></p>
+  </section>
+
   <footer class="foot">Play money only. No purchases, no prizes, no real-world value.</footer>
 </main>
 
@@ -1708,6 +1734,7 @@ html.hard #introMode{border-color:rgba(226,106,82,.5)}
     <a class="tab" href="#online" data-tab="online"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-globe"/></svg><span>Online</span></a>
     <a class="tab" href="#work" data-tab="work"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-work"/></svg><span>Work</span><i class="tab-dot" id="workDot" hidden></i></a>
     <a class="tab" href="#prestige" data-tab="prestige"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-board"/></svg><span>Prestige</span></a>
+    <a class="tab" href="#ranks" data-tab="ranks"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ranks"/></svg><span>Ranks</span></a>
     <a class="tab" href="#settings" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gear"/></svg><span>Settings</span></a>
   </div>
 </nav>
@@ -2565,6 +2592,7 @@ function save() {
   S.meta.updatedAt = Date.now();
   if (!saveTimer) saveTimer = setTimeout(persistLocal, 250);
   Cloud.markDirty();
+  Board.touch();
 }
 
 /* ================= sound ================= */
@@ -2886,7 +2914,7 @@ function refresh() {
 const busy = () => spinning || drawing || rouSpinning || sbLive() || bjBusy;
 
 /* ================= router ================= */
-const VIEWS = ['home', 'phone', 'packs', 'casino', 'lotto', 'sports', 'trade', 'work', 'prestige', 'settings'];
+const VIEWS = ['home', 'phone', 'packs', 'casino', 'lotto', 'sports', 'trade', 'work', 'prestige', 'ranks', 'settings'];
 const STATIONS = ['packs', 'casino', 'lotto', 'sports', 'trade'];
 let current = null;
 function route() {
@@ -2909,7 +2937,7 @@ function show(v) {
   $$('.tab').forEach(a => { if (a.dataset.tab === top) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   $$('[data-og]').forEach(a => { if (a.dataset.og === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   if (prev !== null && prev !== v) { if (tabOf(prev) !== top) window.scrollTo(0, 0); if (v === 'phone') $('#phBody').scrollTop = 0; }
-  ({home: renderHome, phone: () => renderPhone(), packs: renderPacks, casino: renderCasino, lotto: renderLotto, sports: renderSports, trade: renderTrade, work: renderWork, prestige: renderPrestige, settings: renderSettings})[v]();
+  ({home: renderHome, phone: () => renderPhone(), packs: renderPacks, casino: renderCasino, lotto: renderLotto, sports: renderSports, trade: renderTrade, work: renderWork, prestige: renderPrestige, ranks: renderRanks, settings: renderSettings})[v]();
   paintLock(v);
   marketPulse();
   refresh();
@@ -5678,6 +5706,61 @@ function takePerson(raw, id) {
   }
 }
 
+/* ================= leaderboard (Firebase Realtime Database, over its REST address) ================= */
+/* leaderboard/{person id} = {name, gold, mode, runs, at}. Written a few seconds after gold changes; the top 50 are read back */
+const LB_URL = 'https://foolsgoldleaderboard-default-rtdb.firebaseio.com/leaderboard';
+const Board = {
+  sent: {}, timer: 0, hold: 0, rows: [], state: 'idle', at: 0, poll: 0,
+  put(e, keep) {
+    if (!e || !e.id || !e.name || Date.now() < this.hold) return;
+    const gold = Math.max(0, Math.floor(e.gold)), sig = [e.name, gold, e.mode, e.runs].join('|');
+    if (this.sent[e.id] === sig) return;
+    this.sent[e.id] = sig;
+    const bad = () => { delete this.sent[e.id]; this.hold = Date.now() + 60000; };
+    fetch(LB_URL + '/' + encodeURIComponent(e.id) + '.json', {method: 'PUT', keepalive: !!keep,
+      body: JSON.stringify({name: e.name, gold: gold, mode: e.mode, runs: e.runs || 1, at: {'.sv': 'timestamp'}})})
+      .then(r => { if (!r.ok) bad(); }).catch(bad);
+  },
+  touch() { if (!this.timer) this.timer = setTimeout(() => this.flush(), 20000); },
+  flush(keep) { clearTimeout(this.timer); this.timer = 0; if (S.id) this.put(entryOf(S), keep); },
+  async load(force) {
+    if (!force && this.state === 'ok' && Date.now() - this.at < 5000) return;
+    if (this.state !== 'ok') { this.state = 'loading'; paintRanks(); }
+    try {
+      let r = await fetch(LB_URL + '.json?orderBy=%22gold%22&limitToLast=50');
+      if (r.status === 400) r = await fetch(LB_URL + '.json');
+      if (!r.ok) throw r.status;
+      const d = (await r.json()) || {};
+      this.rows = Object.keys(d).map(id => Object.assign({id: id}, d[id]))
+        .filter(x => typeof x.name === 'string' && typeof x.gold === 'number')
+        .sort((a, b) => b.gold - a.gold).slice(0, 50);
+      this.state = 'ok';
+    } catch (e) { this.state = 'err'; }
+    this.at = Date.now(); paintRanks();
+  },
+  init() {
+    $('#lbRefresh').addEventListener('click', () => { this.flush(); this.load(true); });
+    setTimeout(() => { PEOPLE.list.forEach(e => { if (e.id !== S.id) this.put(e); }); this.flush(); }, 3000);
+  }
+};
+function renderRanks() {
+  Board.flush(); Board.load();
+  if (!Board.poll) Board.poll = setInterval(() => { if (current === 'ranks' && !document.hidden) Board.load(true); }, 30000);
+  paintRanks();
+}
+function paintRanks() {
+  const box = $('#lbBox'), note = $('#lbNote'), B = Board; if (!box) return;
+  if (B.state === 'err') { box.innerHTML = '<p class="lb-msg">The leaderboard can’t be reached right now. Check the database address and rules, then press Refresh.</p>'; note.textContent = ''; return; }
+  if (B.state !== 'ok') { box.innerHTML = '<p class="lb-msg">Loading the leaderboard…</p>'; note.textContent = ''; return; }
+  const mine = new Set(PEOPLE.list.map(e => e.id));
+  box.innerHTML = B.rows.length
+    ? '<ol class="lb">' + B.rows.map((r, i) => '<li' + (mine.has(r.id) ? ' class="me"' : '') + '><span class="lb-rank">' + (i + 1) + '</span><span class="lb-who"><b>' + esc(r.name) + '</b><small>' + esc((MODES[r.mode] ? MODES[r.mode].name : 'Normal') + (r.runs > 1 ? ' · run ' + r.runs : '')) + '</small></span><span class="lb-gold">' + goldTag(r.gold) + '</span></li>').join('') + '</ol>'
+    : '<p class="lb-msg">Nobody is on the board yet. Play a round and you’ll show up here.</p>';
+  note.textContent = B.rows.length >= 50 && S.id && !B.rows.some(r => r.id === S.id)
+    ? S.name + ' is outside the top 50 with ' + fmt(S.gold) + ' gold.'
+    : 'Everyone’s name and gold show here. It updates every 30 seconds.';
+}
+
 /* ================= the main menu: your people, a new person, settings ================= */
 let menuView = 'home', delArmed = '', delTimer = 0;
 function openMenu(view) {
@@ -6160,7 +6243,7 @@ function bind() {
     if (current === 'work' && job && !e.repeat && (onBody || (e.target.closest && e.target.closest('#desk')))) workKey(e);
   });
   window.addEventListener('hashchange', route);
-  const flushAll = () => { if (job) clockOut(true); persistLocal(); Cloud.flush(); };
+  const flushAll = () => { if (job) clockOut(true); persistLocal(); Cloud.flush(); Board.flush(true); };
   window.addEventListener('pagehide', flushAll);
   document.addEventListener('visibilitychange', () => { if (document.hidden) flushAll(); clockPulse(); });
 }
@@ -6197,6 +6280,7 @@ function start() {
   if (!auto || !S.id) openMenu(S.id ? 'home' : 'new');
   clockPulse();
   Cloud.init();
+  Board.init();
 }
 try { if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({view: current})); } catch (e) {}
 if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start();
